@@ -11,13 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('recipes', function (Blueprint $table) {
+        Schema::create('steps', function (Blueprint $table) {
             $table->id();
+            $table->string('item');
+
+            $table->unsignedBigInteger('recipe_id')->unsigned();
+            $table->foreign('recipe_id')->references('id')->on('recipes')->onDelete('cascade');
+
             $table->timestamps();
-            $table->string('title');
-            $table->string('description');
-            $table->string('image_path')->nullable();
-            $table->boolean('is_public')->default(false)->nullable();
         });
     }
 
@@ -26,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('recipes');
+        Schema::dropIfExists('steps');
     }
 };

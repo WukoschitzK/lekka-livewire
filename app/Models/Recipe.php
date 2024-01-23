@@ -11,12 +11,17 @@ class Recipe extends Model
     use HasFactory;
 
     protected $fillable = [
-        'title', 'description', 'ingredients', 'steps', 'image_path', 'is_public'
+        'title', 'description', 'image_path', 'is_public'
     ];
     public $timestamps = true;
 
-    public function ingredient()
+    public function ingredients()
     {
         return $this->hasMany(Ingredient::class);
+    }
+
+    public function steps()
+    {
+        return $this->hasMany(Step::class);
     }
 }

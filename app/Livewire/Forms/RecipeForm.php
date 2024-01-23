@@ -2,10 +2,12 @@
 
 namespace App\Livewire\Forms;
 
-use Livewire\Attributes\Rule;
-use App\Models\Recipe as Recipes;
 use Livewire\Form;
+use App\Models\Step;
+use App\Models\Ingredient;
+use Livewire\Attributes\Rule;
 use Livewire\WithFileUploads;
+use App\Models\Recipe as Recipes;
 
 class RecipeForm extends Form
 {
@@ -18,17 +20,16 @@ class RecipeForm extends Form
     #[Rule('required|min:3')]
     public $description;
 
-    #[Rule('required')]
-    public $ingredients;
+    #[Rule('required|array|min:1')]
+    public $ingredients = [];
 
     #[Rule('required')]
-    public $steps;
+    public $steps = [];
 
     public $image;
 
     public $image_path = '';
     public $is_public = false;
-
 
     public function store()
     {
@@ -36,12 +37,15 @@ class RecipeForm extends Form
         $this->validate();
 
         // convert steps to json format
-        $this->steps = json_encode($this->steps);
+        // $this->steps = json_encode($this->steps);
 
         // convert ingredients to json format
-        $this->ingredients = json_encode($this->ingredients);
+        // $this->ingredients = json_encode($this->ingredients);
 
-        $this->image->store('recipe_images', 'public');
+        if ($this->image) {
+            $this->image->store('recipe_images', 'public');
+        }
+
 
         // get storage path of stored image to show it in the view
         $this->image_path = 'storage/recipe_images/' . $this->image->hashName();
@@ -49,17 +53,27 @@ class RecipeForm extends Form
         $recipe = Recipes::create([
             'title' => $this->title,
             'description' => $this->description,
-            'ingredients' => $this->ingredients,
-            'steps' => $this->steps,
+            // 'ingredients' => $this->ingredients,
+            // 'steps' => $this->steps,
             'image_path' => $this->image_path,
             'is_public' => $this->is_public,
         ]);
 
         // create ingredient entry in table ingredient
-        $recipe->ingredient()->create([
-            'item' => $this->ingredients
-        ]);
+        // $recipe->ingredient()->create([
+        //     'item' => $this->ingredients
+        // ]);
+        foreach ($this->ingredients as $ingredientName) {
+            $ingredient = new Ingredient();
+            $ingredient->item = $ingredientName['ingredientText'];
+            $recipe->ingredients()->save($ingredient);
+        }
 
+        foreach ($this->steps as $stepItem) {
+            $step = new Step();
+            $step->item = $stepItem['stepText'];
+            $recipe->steps()->save($step);
+        }
 
         session()->flash('success', 'Recipe created successfully.');
 
@@ -76,20 +90,40 @@ class RecipeForm extends Form
     public function update($id)
     {
         $recipe = Recipes::findOrFail($id);
-        // $this->image->store('recipe_images', 'public');
 
-        $this->image->store('recipe_images', 'public');
-
+        if ($this->image) {
+            $this->image->store('recipe_images', 'public');
+            $this->image_path = 'storage/recipe_images/' . $this->image->hashName();
+        }
         // get storage path of stored image to show it in the view
-        $this->image_path = 'storage/recipe_images/' . $this->image->hashName();
 
         $recipe->update([
             'title' => $this->title,
             'description' => $this->description,
-            'ingredients' => $this->ingredients,
-            'steps' => $this->steps,
+            //'ingredients' => $this->ingredients,
+            //'steps' => $this->steps,
             'image_path' => $this->image_path,
             'is_public' => $this->is_public,
         ]);
+
+        // update all ingredients with current values
+        foreach ($this->ingredients as $ingredientName) {
+           
+        }
+
+        // foreach ($this->steps as $stepItem) {
+        //     $step = new Step();
+        //     $step->item = $stepItem['stepText'];
+        //     $recipe->steps()->save($step);
+        // }
+
+        // update ingredient entry in table ingredient
+        // $recipe->ingredients()->update([
+        //     'item' => $this->ingredients
+        // ]);
+
+        // $recipe->steps()->update([
+        //     'item' => $this->steps
+        // ]);
     }
 }

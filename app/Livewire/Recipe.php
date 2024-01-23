@@ -24,7 +24,7 @@ class Recipe extends Component
 
     public function render()
     {
-        $this->recipes = Recipes::all();
+        $this->recipes = Recipes::with('ingredients')->get();
         return view('livewire.recipe')->with([
             'recipes' => Recipes::all()
         ]);
@@ -68,15 +68,26 @@ class Recipe extends Component
     //TODO update to form object
     public function edit($id)
     {
-        $recipe = Recipes::findOrFail($id);
+        $recipe = Recipes::with('ingredients')->with('steps')->findOrFail($id);
+
         $this->recipeId = $id;
         $this->form->title = $recipe->title;
         $this->form->description = $recipe->description;
-        $this->form->ingredients = $recipe->ingredients;
-        $this->form->steps = $recipe->steps;
+        $this->form->ingredients = $recipe->ingredients()->get();
+        $this->form->steps = $recipe->steps()->get();
         $this->form->image_path = $recipe->image_path;
         $this->form->is_public = $recipe->is_public;
 
+
+        $ingredients = $recipe->ingredients()->get();
+        foreach ($ingredients as $ingredient) {
+            $this->form->ingredients[] = ['ingredientText' => $ingredient->item];
+        }
+
+        $steps = $recipe->steps()->get();
+        foreach ($steps as $step) {
+            $this->form->steps[] = ['stepText' => $step->item];
+        }
 
         $this->openModal();
     }

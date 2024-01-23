@@ -15,9 +15,9 @@
 
     <div class="grid grid-cols-3 gap-4 justify-between">
         @foreach ($recipes as $recipe)
-            @foreach ($recipe->ingredient as $ingredient)
-                <h3>my ingredient: {{ $ingredient }}</h3>
-            @endforeach
+            {{-- @foreach ($recipe->ingredient as $ingredient)
+                <h3>my ingredient: {{ $ingredient->item }}</h3>
+            @endforeach --}}
             <div wire:key="{{ $recipe->id }}" class="p-6 shadow-md sm:rounded-lg ">
                 <img src="{{ asset($recipe->image_path) }}" alt="foooood">
                 <h3>{{ $recipe->title }}</h3>
@@ -94,16 +94,80 @@
                                         <div class="mb-4">
                                             <label for="steps"
                                                 class="block text-gray-700 font-bold mb-2">Steps:</label>
-                                            <textarea id="steps" wire:model="form.steps" rows="4" class="w-full border border-gray-300 px-4 py-2 rounded"></textarea>
+                                            {{-- <textarea id="steps" wire:model="form.steps" rows="4" class="w-full border border-gray-300 px-4 py-2 rounded"></textarea> --}}
+
+                                            <div x-data="{
+                                                steps: @entangle('form.steps'),
+                                                addNewStep() {
+                                                    this.steps.push({
+                                                        stepText: '',
+                                                    });
+                                                },
+                                                removeStep(index) {
+                                                    this.steps.splice(index, 1);
+                                                }
+                                            }">
+                                                <template x-for="(step, index) in steps" :key="index">
+                                                    <div>
+                                                        <div x-text="index + 1"></div>
+                                                        <textarea type="text" x-model="step.stepText" name="stepText" class="form-control"></textarea>
+                                                        <button type="button" class="btn btn-danger btn-small"
+                                                            @click="removeStep(index)">Remove</button>
+                                                    </div>
+                                                </template>
+
+                                                <button type="button" class="btn btn-info" @click="addNewStep()">+ Add
+                                                    Row</button>
+
+                                                {{-- <textarea id="steps" wire:model="form.steps" rows="4" class="w-full border border-gray-300 px-4 py-2 rounded"></textarea> --}}
+
+
+                                            </div>
+
                                         </div>
+
+
 
                                         {{-- input fields for ingredients can be added dynamically with plus button --}}
 
                                         <div class="mb-4">
                                             <label for="ingredients"
                                                 class="block text-gray-700 font-bold mb-2">Ingredients:</label>
-                                            <input id="ingredients" wire:model="form.ingredients" rows="4"
-                                                class="w-full border border-gray-300 px-4 py-2 rounded">
+
+
+                                            <div x-data="{
+                                                ingredients: @entangle('form.ingredients'),
+                                                addNewIngredient() {
+                                                    this.ingredients.push({
+                                                        ingredientText: '',
+                                                    });
+                                                },
+                                                removeIngredient(index) {
+                                                    this.ingredients.splice(index, 1);
+                                                }
+                                            }">
+                                                <template x-for="(ingredient, index) in ingredients"
+                                                    :key="index">
+                                                    <div>
+                                                        <div x-text="index + 1"></div>
+                                                        <textarea type="text" x-model="ingredient.ingredientText" name="ingredientText" class="form-control"></textarea>
+                                                        <button type="button" class="btn btn-danger btn-small"
+                                                            @click="removeIngredient(index)">Remove</button>
+                                                    </div>
+                                                </template>
+
+                                                <button type="button" class="btn btn-info"
+                                                    @click="addNewIngredient()">+ Add
+                                                    Row</button>
+
+                                                {{-- <textarea id="steps" wire:model="form.steps" rows="4" class="w-full border border-gray-300 px-4 py-2 rounded"></textarea> --}}
+
+
+                                            </div>
+
+
+                                            {{-- <input id="ingredients" wire:model="form.ingredients" rows="4"
+                                                class="w-full border border-gray-300 px-4 py-2 rounded"> --}}
                                         </div>
 
                                         <div>
