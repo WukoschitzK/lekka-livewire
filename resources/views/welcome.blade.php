@@ -22,6 +22,9 @@
         Happy Hacking!
     </h1>
 
+    {{-- form in form component --}}
+    <livewire:form-builder />
+
     {{-- TODO: add to presentation, lazy loading of component with placeholder method --}}
     <livewire:recipe />
 </body>
